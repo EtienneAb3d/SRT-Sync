@@ -50,7 +50,7 @@ Saving: data/KatyPerry-Firework.mp3.srt ...
 # Synchronize
 
 ```
-python SrtSync.py "./data/KatyPerry-Firework.mp3.srt" "./data/KatyPerry-Firework.txt"
+python3 SrtSync.py "./data/KatyPerry-Firework.mp3.srt" "./data/KatyPerry-Firework.txt"
 
 Output (data/KatyPerry-Firework.txt.srt):
 ==========
