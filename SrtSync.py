@@ -63,17 +63,13 @@ class SrtSync:
 
 
 def main():
-    try:
-        parser = argparse.ArgumentParser(description="Synchronize SRT timestamps over an existing accurate transcription.")
-        parser.add_argument('pathSrt', type=str, help="Path to the SRT file with good timestamps")
-        parser.add_argument('pathTxt', type=str, help="Path to the TXT file with good text")
-        parser.add_argument('lng', type=str, help="language", nargs='?')
-        args = parser.parse_args()
-        
-        SrtSync().sync(args.pathSrt, args.pathTxt)
-    except BaseException:
-        print("")
+    parser = argparse.ArgumentParser(description="Synchronize SRT timestamps over an existing accurate transcription.")
+    parser.add_argument('pathSrt', type=str, help="Path to the SRT file with good timestamps")
+    parser.add_argument('pathTxt', type=str, help="Path to the TXT file with good text")
+    parser.add_argument('lng', type=str, help="language", nargs='?')
+    args = parser.parse_args()
     
+    SrtSync().sync(args.pathSrt, args.pathTxt)
 
 if __name__ == "__main__":
     main()
