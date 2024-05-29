@@ -5,6 +5,7 @@ Created on Tue May 28 11:19:48 2024
 
 @author: cubaix
 """
+import argparse
 import re
 from CbxAligner import CbxAligner
 
@@ -60,4 +61,19 @@ class SrtSync:
     def test(self):
         self.sync("./data/KatyPerry-Firework.mp3.srt", "./data/KatyPerry-Firework.txt")
 
-# SrtSync().test()
+
+def main():
+    try:
+        parser = argparse.ArgumentParser(description="Synchronize SRT timestamps over an existing accurate transcription.")
+        parser.add_argument('pathSrt', type=str, help="Path to the SRT file with good timestamps")
+        parser.add_argument('pathTxt', type=str, help="Path to the TXT file with good text")
+        parser.add_argument('lng', type=str, help="language", nargs='?')
+        args = parser.parse_args()
+        
+        SrtSync().sync(args.pathSrt, args.pathTxt)
+    except BaseException:
+        print("")
+    
+
+if __name__ == "__main__":
+    main()
