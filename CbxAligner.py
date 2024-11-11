@@ -11,7 +11,7 @@ from CbxTokenizer import CbxToken
 
 class CbxAligner:
     _COST_INCREDIBLE = 1000000
-    compressPosFactor = 1.0/100000.0
+    compressPosFactor = 1.0/1000000.0
     
     def __init__(self):
         self.tokenizer = CbxTokenizer()
@@ -51,12 +51,12 @@ class CbxAligner:
         # Eval costs
         for x in range(1,len(toks1)+1):
             for y in range(1,len(toks2)+1):
-                cost = self.cost(toks1[x-1],toks2[y-1])
+                cost = self.costP(toks1[x-1],toks2[y-1])
                 # For equivalent matches, prefer the earlier
                 cost += (toks1[x-1].index + toks2[y-1].index)*self.compressPosFactor
                 cost0 = costs[x-1][y-1] + 0.99 * cost
-                cost1 = costs[x-1][y] + 1
-                cost2 = costs[x][y-1] + 1
+                cost1 = costs[x-1][y] + self.costT(toks1[x-1])
+                cost2 = costs[x][y-1] + self.costT(toks2[y-1])
                 if cost0 <= cost1 and cost0 <= cost2:
                     choices[x][y] = 0 # Match
                     costs[x][y] = cost0
@@ -86,11 +86,23 @@ class CbxAligner:
         pairs = [pairs[p] for p in range(len(pairs)-1,-1,-1)]
         return pairs
                   
-    def cost(self,tok1,tok2):
+    def costT(self,tok):
+        st = tok.token.strip()
+        if st == "":
+            return 0.1
+        return 1.0
+    
+    def costP(self,tok1,tok2):
         if tok1.kind != tok2.kind:
             return self._COST_INCREDIBLE
         if tok1.token == tok2.token:
             return 0
+        st1 = tok1.token.strip()
+        st2 = tok2.token.strip()
+        if st1 == st2:
+            return 0.01
+        if st1 == "" or st2 == "":
+            return 1.5
         lc1 = tok1.token.lower()
         lc2 = tok2.token.lower()
         if lc1 == lc2:
@@ -99,7 +111,7 @@ class CbxAligner:
             return 1.0
         if len(lc1) > 2 and len(lc2) > 2 and (lc1.find(lc2) >= 0 or lc2.find(lc1) >= 0):
             return 1.0
-        return 2.0 - 2.0*(min(len(lc1),len(lc2))/(len(lc1)+len(lc2)))
+        return 2.0 - 0.1*(min(len(lc1),len(lc2))/(len(lc1)+len(lc2)))
     
     def tracePairs(self,pairs):
         for p in pairs:
@@ -113,7 +125,7 @@ class CbxAligner:
     
     def test(self):
         self.tracePairs(
-            self.alignXml("- <a>Bonjour</a> ! Comment ça va, <i>aujourd'hui</i> ?"
-                          ,"<a>Salut</a> ! Comment ça va super bien <i>aujourd'hui</i> ?.."))
+            self.alignXml("- <a>Bonjour toi </a> ! Comment ça va, <i>aujourd'hui</i> ?"
+                          ,"<a>Salut moi </a> ! Comment ça va super bien <i>aujourd'hui</i> ?.."))
 
 # CbxAligner().test()
